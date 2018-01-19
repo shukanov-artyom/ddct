@@ -1,17 +1,14 @@
 using System;
 using System.Threading.Tasks;
-
-using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
-using System.Net.Http;
+using Microsoft.Bot.Connector;
 
-
-namespace Microsoft.Bot.Sample.SimpleEchoBot
+namespace SimpleEchoBot.Dialogs
 {
     [Serializable]
-    public class EchoDialog : IDialog<object>
+    public class RootDialog : IDialog<object>
     {
-        protected int count = 1;
+        private int count = 1;
 
         public async Task StartAsync(IDialogContext context)
         {
@@ -21,7 +18,6 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             var message = await argument;
-
             if (message.Text == "reset")
             {
                 PromptDialog.Confirm(
