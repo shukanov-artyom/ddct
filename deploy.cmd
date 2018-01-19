@@ -68,8 +68,8 @@ SET MSBUILD_PATH=%ProgramFiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe
 echo Handling .NET Web Application deployment.
 
 :: 1. Restore NuGet packages
-IF /I "Bot.sln" NEQ "" (
-  call :ExecuteCmd nuget restore "%DEPLOYMENT_SOURCE%\Bot.sln"
+IF /I "Ddct.sln" NEQ "" (
+  call :ExecuteCmd nuget restore "%DEPLOYMENT_SOURCE%\Ddct.sln"
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
