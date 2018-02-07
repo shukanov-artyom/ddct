@@ -11,6 +11,7 @@ namespace Bot.Dialogs
     {
         public async Task StartAsync(IDialogContext context)
         {
+            await context.SayAsync("ok, processing that doc");
             context.Wait(MessageReceivedAsync);
         }
 
