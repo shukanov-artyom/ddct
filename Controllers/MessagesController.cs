@@ -2,11 +2,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using Bot.Dialogs;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
-using SimpleEchoBot.Dialogs;
 
-namespace SimpleEchoBot.Controllers
+namespace Bot.Controllers
 {
     [BotAuthentication]
     public class MessagesController : ApiController
@@ -17,18 +17,23 @@ namespace SimpleEchoBot.Controllers
         /// </summary>
         /// <param name="activity"></param>
         [ResponseType(typeof(void))]
-        public virtual async Task<HttpResponseMessage> Post([FromBody] Activity activity)
+        public virtual async Task<HttpResponseMessage> Post(
+            [FromBody] Activity activity)
         {
             // check if activity is of type message
-            if (activity != null && activity.GetActivityType() == ActivityTypes.Message)
+            if (activity != null
+                && activity.GetActivityType() == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new RootDialog());
+                await Conversation.SendAsync(
+                    activity,
+                    () => new RootDialog());
             }
             else
             {
                 HandleSystemMessage(activity);
             }
-            return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
+            return new HttpResponseMessage(
+                System.Net.HttpStatusCode.Accepted);
         }
 
         private Activity HandleSystemMessage(Activity message)

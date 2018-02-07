@@ -1,53 +1,49 @@
 using System;
 using System.Threading.Tasks;
+using Bot.Utils;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 
-namespace SimpleEchoBot.Dialogs
+namespace Bot.Dialogs
 {
     [Serializable]
     public class RootDialog : IDialog<object>
     {
-        private int count = 1;
-
         public async Task StartAsync(IDialogContext context)
         {
             context.Wait(MessageReceivedAsync);
         }
 
-        public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
+        public async Task MessageReceivedAsync(
+            IDialogContext context,
+            IAwaitable<IMessageActivity> argument)
         {
             var message = await argument;
-            if (message.Text == "reset")
+            var linksExtractor = new LinksExtractor(message.Text);
+            int linksCount = linksExtractor.GetDetectedLinksCount();
+            if (linksCount > 1)
             {
-                PromptDialog.Confirm(
-                    context,
-                    AfterResetAsync,
-                    "Are you sure you want to reset the count?",
-                    "Didn't get that!",
-                    promptStyle: PromptStyle.Auto);
+                await context.PostAsync(
+                    "Wow, let's do one link at a time, i'm not so intelligent yet.");
+            }
+            else if (linksCount == 1)
+            {
+                await context.Forward(
+                    new ProcessLinkDialog(),
+                    ResumeAfterLinkProcessed,
+                    message);
             }
             else
             {
-                await context.PostAsync($"{this.count++}: You said {message.Text}");
                 context.Wait(MessageReceivedAsync);
             }
         }
 
-        public async Task AfterResetAsync(IDialogContext context, IAwaitable<bool> argument)
+        private async Task ResumeAfterLinkProcessed(
+            IDialogContext context,
+            IAwaitable<object> argument)
         {
-            var confirm = await argument;
-            if (confirm)
-            {
-                this.count = 1;
-                await context.PostAsync("Reset count.");
-            }
-            else
-            {
-                await context.PostAsync("Did not reset count.");
-            }
             context.Wait(MessageReceivedAsync);
         }
-
     }
 }
