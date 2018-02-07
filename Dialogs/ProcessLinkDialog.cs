@@ -11,7 +11,6 @@ namespace Bot.Dialogs
     {
         public async Task StartAsync(IDialogContext context)
         {
-            await context.SayAsync("ok, processing that doc");
             context.Wait(MessageReceivedAsync);
         }
 
@@ -19,6 +18,7 @@ namespace Bot.Dialogs
             IDialogContext context,
             IAwaitable<IMessageActivity> argument)
         {
+            await context.SayAsync("ok, processing that doc");
             IMessageActivity messageActivity = await argument;
             string message = messageActivity.Text;
             var extractor = new LinksExtractor(message);
