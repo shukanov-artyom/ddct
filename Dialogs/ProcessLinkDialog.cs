@@ -23,6 +23,7 @@ namespace Bot.Dialogs
             string message = messageActivity.Text;
             var extractor = new LinksExtractor(message);
             List<string> links = extractor.ExtractLinks();
+            await context.SayAsync($"ok, got {links.Count} links");
             if (links.Count > 1)
             {
                 throw new InvalidOperationException(
