@@ -25,8 +25,8 @@ namespace Bot
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
+                name: "BoEndpoint",
+                routeTemplate: "api/{controller}",
                 defaults: new { id = RouteParameter.Optional }
             );
         }

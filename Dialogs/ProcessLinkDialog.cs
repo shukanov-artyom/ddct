@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Bot.Services;
 using Bot.Utils;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 
 namespace Bot.Dialogs
 {
+    [Serializable]
     public class ProcessLinkDialog : IDialog<object>
     {
+        private string link;
+        private int rating;
+
         public async Task StartAsync(IDialogContext context)
         {
             context.Wait(MessageReceivedAsync);
@@ -24,6 +30,7 @@ namespace Bot.Dialogs
             var extractor = new LinksExtractor(message);
             List<string> links = extractor.ExtractLinks();
             await context.SayAsync($"ok, got {links.Count} links");
+            link = links.First();
             if (links.Count > 1)
             {
                 throw new InvalidOperationException(
@@ -43,7 +50,26 @@ namespace Bot.Dialogs
             IDialogContext context,
             IAwaitable<long> argument)
         {
-            throw new NotImplementedException();
+            rating = (int)await argument;
+            string message = GetMessageAfterRatingSet(rating);
+            await context.SayAsync(message);
+            var scraper = new ScraperService();
+            string scrappedText = await scraper.ScrapAsync(link);
+            await context.SayAsync($"Scrapped {scrappedText.Length} symbols from this page");
+            context.Done<object>(null);
+        }
+
+        private static string GetMessageAfterRatingSet(int rating)
+        {
+            if (rating >= 8)
+            {
+                return 
+                    "Oh, looks like it's something really interesting.";
+            }
+            else
+            {
+                return "Got it. Analysing.";
+            }
         }
     }
 }
