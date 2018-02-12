@@ -6,12 +6,15 @@ using Bot.Services;
 using Bot.Utils;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using Test;
 
 namespace Bot.Dialogs
 {
     [Serializable]
     public class ProcessLinkDialog : IDialog<object>
     {
+        private const int MaxDocumentLength = 5000; // MS Text Analytics Api limitation
+
         private string link;
         private int rating;
 
@@ -55,7 +58,12 @@ namespace Bot.Dialogs
             await context.SayAsync(message);
             var scraper = new ScraperService();
             string scrappedText = await scraper.ScrapAsync(link);
-            await context.SayAsync($"Scrapped {scrappedText.Length} symbols from this page");
+            TextSplitter splitter = new TextSplitter(scrappedText);
+            string[] split = splitter.Split(MaxDocumentLength);
+            var cleanser = new SplitCleanser();
+            split = cleanser.Cleanse(split);
+            var textAnalytics = new TextAnalyticsApiService();
+            var keywords = await textAnalytics.GetKeywordsAsync(split);
             context.Done<object>(null);
         }
 

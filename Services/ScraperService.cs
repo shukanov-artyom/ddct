@@ -29,10 +29,21 @@ namespace Bot.Services
                 string content = JsonConvert.SerializeObject(new { url = link });
                 request.Content = new StringContent(content);
 
-                var response = await client.SendAsync(request);
+                var response = await client.PostAsJsonAsync(request);
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new InvalidOperationException(
+                        $"Got Error Code {response.StatusCode}");
+                }
                 string result = await response.Content.ReadAsStringAsync();
-                return result;
+                var obj = JsonConvert.DeserializeObject<ScraperResult>(result);
+                return obj.ScrappedData;
             }
+        }
+
+        private class ScraperResult
+        {
+            public string ScrappedData { get; set; }
         }
     }
 }
