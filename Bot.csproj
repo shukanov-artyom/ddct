@@ -182,10 +182,16 @@
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\ProcessLinkDialog.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
+    <Compile Include="Domain\BotDomainObject.cs" />
+    <Compile Include="Domain\BotUser.cs" />
+    <Compile Include="Domain\Document.cs" />
+    <Compile Include="Domain\DocumentRating.cs" />
+    <Compile Include="Domain\UserDocumentRating.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IPersistencyService.cs" />
     <Compile Include="Services\ScraperService.cs" />
     <Compile Include="Services\TextAnalyticsApiService.cs" />
     <Compile Include="Utils\LinksExtractor.cs" />

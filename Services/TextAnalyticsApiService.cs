@@ -26,23 +26,56 @@ namespace Bot.Services
                     HttpMethod.Post,
                     TextAnalyticsApiAddress);
                 request.Headers.Add("Ocp-Apim-Subscription-Key", ApiKey);
-                var container = new
-                {
-                    documents = new List<dynamic>()
-                };
+                var container = new AnalyticsRequestContent();
                 for (int i = 0; i < segments.Length; i++)
                 {
-                    dynamic document = 0;
-                    document.id = i + 1;
-                    document.text = segments[i];
-                    container.documents.Add(document);
+                    var document = new AnalyticsRequestDocument();
+                    document.Id = (i + 1).ToString();
+                    document.Text = segments[i];
+                    container.Documents.Add(document);
                 }
                 string content = JsonConvert.SerializeObject(container);
                 request.Content = new StringContent(content);
+                request.Content.Headers.ContentType =
+                    new MediaTypeHeaderValue("application/json");
                 var response = await client.SendAsync(request);
                 string result = await response.Content.ReadAsStringAsync();
-                return result.Split(' ').ToArray();
+                var obj = JsonConvert.DeserializeObject<TextAnalyticsResponse>(result);
+                IEnumerable<string> top10 = obj.Documents.First().KeyPhrases.Take(10);
+                // TODO : select most promising keywords from other docs as well
+                return top10.ToArray();
             }
+        }
+
+        private class AnalyticsRequestContent
+        {
+            public AnalyticsRequestContent()
+            {
+                Documents = new List<AnalyticsRequestDocument>();
+            }
+
+            public List<AnalyticsRequestDocument> Documents { get; }
+        }
+
+        private class AnalyticsRequestDocument
+        {
+            public string Id { get; set; }
+
+            public string Text { get; set; }
+        }
+
+        private class TextAnalyticsResponse
+        {
+            public List<TextAnalyticsResponseDocument> Documents { get; set; } =
+                new List<TextAnalyticsResponseDocument>();
+        }
+
+        private class TextAnalyticsResponseDocument
+        {
+            public string Id { get; set; }
+
+            public List<string> KeyPhrases { get; set; } =
+                new List<string>();
         }
     }
 }

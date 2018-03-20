@@ -58,12 +58,11 @@ namespace Bot.Dialogs
             await context.SayAsync(message);
             var scraper = new ScraperService();
             string scrappedText = await scraper.ScrapAsync(link);
-            TextSplitter splitter = new TextSplitter(scrappedText);
+            TextSplitter splitter = new TextSplitter(scrappedText.Trim());
             string[] split = splitter.Split(MaxDocumentLength);
-            var cleanser = new SplitCleanser();
-            split = cleanser.Cleanse(split);
             var textAnalytics = new TextAnalyticsApiService();
             var keywords = await textAnalytics.GetKeywordsAsync(split);
+            await context.PostAsync($"Keywords: {String.Join(",", keywords)}");
             context.Done<object>(null);
         }
 
